@@ -96,6 +96,12 @@ console.log('cwd:', list.body.cwd)
 console.log('roots:', list.body.roots.map((root) => `${root.source}=${root.dir}${root.active ? '' : ' (inactive)'}`).join('\n       '))
 console.log('skills:', list.body.skills.length)
 console.log('duplicates:', list.body.duplicates.length)
+console.log('describedBy:', list.body.describedBy)
+if (typeof list.body.describedBy !== 'string') {
+  console.log('MISS  list must report who wrote the descriptions')
+  process.exit(1)
+}
+console.log('ok    list reports a describedBy string')
 
 const bySource = new Map()
 for (const skill of list.body.skills) bySource.set(skill.source, (bySource.get(skill.source) ?? 0) + 1)

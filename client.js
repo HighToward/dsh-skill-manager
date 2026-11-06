@@ -74,6 +74,8 @@ window.__ModuleLoader__.load({
         'meta.count': '{count} 个技能',
         'meta.roots': '扫描了 {count} 个目录',
         'meta.model': '说明由 {model} 生成',
+        'meta.no_summaries': '说明还没写过',
+        'meta.write_with': '用 {model} 写说明',
         'meta.no_model': '没有可用的默认模型',
         'meta.pick_model': '选一个模型',
         'empty.title': '没有匹配的技能',
@@ -189,6 +191,8 @@ window.__ModuleLoader__.load({
         'meta.count': '{count} skills',
         'meta.roots': 'scanned {count} roots',
         'meta.model': 'summaries by {model}',
+        'meta.no_summaries': 'summaries not written yet',
+        'meta.write_with': 'write summaries with {model}',
         'meta.no_model': 'no default model',
         'meta.pick_model': 'Pick a model',
         'empty.title': 'Nothing matches',
@@ -1297,6 +1301,11 @@ window.__ModuleLoader__.load({
         ? `${data.model.provider}/${data.model.model}`
         : '';
       const chosen = model !== '' ? model : modelLabel;
+      // The summary line is a record of the descriptions currently on screen,
+      // not a preview of the dropdown. It must stay put when the user picks a
+      // different model, so it reads the model the host says actually wrote
+      // them instead of whatever the toolbar happens to be set to now.
+      const describedBy = typeof data?.describedBy === 'string' ? data.describedBy : '';
 
       // One flat option list, provider on the label, so a long catalog stays a
       // single native dropdown instead of nested optgroups.
@@ -1379,7 +1388,7 @@ window.__ModuleLoader__.load({
                   'data-tone': 'brand',
                   disabled: busy !== '' || phase === 'loading',
                   onClick: runDescribe,
-                  title: chosen === '' ? tr('meta.no_model') : tr('meta.model', { model: chosen }),
+                  title: chosen === '' ? tr('meta.no_model') : tr('meta.write_with', { model: chosen }),
                 }, busy === 'describe' ? tr('toolbar.describing') : tr('toolbar.describe')),
                 h('button', {
                   type: 'button',
@@ -1492,7 +1501,7 @@ window.__ModuleLoader__.load({
               data?.roots ? h('span', { className: 'sc-dot' }) : null,
               data?.roots ? h('span', null, tr('meta.roots', { count: data.roots.length })) : null,
               h('span', { className: 'sc-dot' }),
-              h('span', null, chosen === '' ? tr('meta.no_model') : tr('meta.model', { model: chosen })),
+              h('span', null, describedBy === '' ? tr('meta.no_summaries') : tr('meta.model', { model: describedBy })),
             ),
             notice !== null
               ? h('div', { className: 'sc-notice', 'data-tone': notice.tone === 'error' ? 'error' : 'info' }, notice.text)

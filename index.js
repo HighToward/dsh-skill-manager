@@ -1181,6 +1181,24 @@ function applyImpl(ctx) {
             const fresh = stored !== undefined && stored.hash === skill.hash && isChinese(stored.text)
             return { ...skill, summary: fresh ? stored.text : '' }
           })
+          // The summary line credits the model that actually wrote the
+          // descriptions on screen, not the one currently picked in the
+          // dropdown. Every stored entry remembers its own model and time, so
+          // the newest fresh one is the last model that wrote a description.
+          // Stale entries are left out: they are not being shown, so they must
+          // not claim credit either.
+          let describedBy = ''
+          let describedAt = 0
+          for (const skill of skills) {
+            const stored = store.descriptions[skill.name]
+            const fresh = stored !== undefined && stored.hash === skill.hash && isChinese(stored.text)
+            if (!fresh || typeof stored.model !== 'string' || stored.model === '') continue
+            const at = typeof stored.at === 'number' ? stored.at : 0
+            if (at >= describedAt) {
+              describedAt = at
+              describedBy = stored.model
+            }
+          }
           // A baseline is recorded the first time a skill is seen, so a later
           // check can say whether the file moved on since this panel looked.
           let touched = false
@@ -1199,6 +1217,7 @@ function applyImpl(ctx) {
             types: buildTypes(skills, store),
             relations: buildRelations(skills),
             model: modelRoute(ctx),
+            describedBy,
           })
         } catch (error) {
           sendJson(response, 500, { error: error instanceof Error ? error.message : String(error) })

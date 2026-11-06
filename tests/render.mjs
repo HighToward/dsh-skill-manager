@@ -38,6 +38,7 @@ const payload = {
   roots: [{ source: 'user-dsh' }, { source: 'library' }],
   duplicates: 0,
   model: 'workbuddy/deepseek-v4.1-flash',
+  describedBy: 'qoder/dfmodel',
 }
 const catalog = {
   providers: [{ id: 'workbuddy', name: 'WorkBuddy', models: [{ id: 'deepseek-v4.1-flash', name: 'DeepSeek V4.1 Flash' }] }],
@@ -123,6 +124,20 @@ check('board', board, '浏览器与桌面')
 check('board', board, '文档与表格')
 check('board', board, '点一格类型')
 check('board', board, 'WorkBuddy · DeepSeek V4.1 Flash')
+
+// The summary line credits the model that wrote the descriptions, not the
+// one currently picked in the dropdown. Slot 13 is the dropdown selection;
+// the payload says a different model wrote them. Changing the selection must
+// leave the credit line exactly where it was.
+check('summary credits the writer', board, '说明由 qoder/dfmodel 生成')
+console.log(board.join('|').includes('说明由 workbuddy/deepseek-v4.1-flash 生成') ? 'MISS ' : 'ok   ', 'summary ignores the picked model: workbuddy/deepseek-v4.1-flash')
+store[13] = 'x/some-other-model'
+memo = {}
+const switched = collect(render())
+check('summary stays put after a model switch', switched, '说明由 qoder/dfmodel 生成')
+console.log(switched.join('|').includes('说明由 x/some-other-model 生成') ? 'MISS ' : 'ok   ', 'summary ignores the newly switched model: x/some-other-model')
+store[13] = 'workbuddy/deepseek-v4.1-flash'
+memo = {}
 
 // Pass 3: drilled into one type. Slot 8 is the type filter.
 store[8] = 'browser'

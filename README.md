@@ -10,9 +10,7 @@
 
 ## 它长什么样
 
-![自建类型图标，22px 与 15px，浅色与深色](docs/shelf-icons.png)
-
-![应用图标](docs/icon-256.png)
+![技能管理面板，深色主题下的类型卡片墙](docs/panel.png)
 
 ## 功能
 
@@ -79,6 +77,10 @@ MIT。见 [LICENSE](LICENSE)。
 A skill manager panel for [DeepSeek Harness](https://github.com/deepseek-ai/DeepSeek-Harness). It scans every skill it can find on the machine, lays them out as a wall of type cards, lets you create your own types, move skills into them, have a model write a one-line Simplified Chinese description for each skill, draw an icon for each custom type, see how skills relate, and check whether any of them have a newer version.
 
 Version 0.3.0, MIT licensed, by HighToward.
+
+## Screenshot
+
+![The skill manager panel, dark theme, showing the wall of type cards](docs/panel.png)
 
 ## What it does
 
