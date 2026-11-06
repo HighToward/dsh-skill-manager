@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="sm-bg" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6E7CF7"/>
+      <stop offset="1" stop-color="#7B4DF5"/>
+    </linearGradient>
+    <linearGradient id="sm-card" x1="16" y1="12" x2="44" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EFECFF"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="3" y="3" width="58" height="58" rx="16" fill="url(#sm-bg)"/>
+
+  <!-- the back card, a sliver peeking out on the right -->
+  <path d="M53 24.6c0-3-2-5.6-4.7-6.4M53 24.6v20.2c0 4.6-3.7 8.3-8.3 8.3H34.4"
+        stroke="#FFFFFF" stroke-opacity="0.40" stroke-width="3.4" stroke-linecap="round"/>
+
+  <!-- the front card -->
+  <rect x="12" y="13.5" width="34" height="37" rx="9" fill="url(#sm-card)"/>
+
+  <!-- the sparkle, carved out of the front card -->
+  <path fill="url(#sm-bg)"
+        d="M29 24.4c1.6 7.7 5.4 11.5 13.1 13.1-7.7 1.6-11.5 5.4-13.1 13.1-1.6-7.7-5.4-11.5-13.1-13.1 7.7-1.6 11.5-5.4 13.1-13.1Z"/>
+</svg>

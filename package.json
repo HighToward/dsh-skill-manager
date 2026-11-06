@@ -1,0 +1,56 @@
+{
+  "name": "dsh-skill-manager",
+  "version": "0.3.0",
+  "type": "module",
+  "description": "A DSH web panel that lists every skill on the machine, groups them by type, lets you make your own types, writes one-line Chinese descriptions with a model you pick, draws an icon for each custom type, shows how skills relate, and checks for updates.",
+  "icon": "icon.svg",
+  "author": "HighToward",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HighToward/dsh-skill-manager.git"
+  },
+  "homepage": "https://github.com/HighToward/dsh-skill-manager#readme",
+  "bugs": {
+    "url": "https://github.com/HighToward/dsh-skill-manager/issues"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "skill",
+    "skill-manager",
+    "skills",
+    "cordis",
+    "bundle",
+    "panel"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/en.json": "./locale/en.json",
+    "./locale/zh.json": "./locale/zh.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/en.json",
+    "locale/zh.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

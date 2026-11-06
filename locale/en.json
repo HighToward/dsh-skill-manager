@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Skill manager",
+    "description": "Browse every skill on this machine by type, pick the model that writes each one-line summary, see how skills relate, and check whether any of them moved upstream."
+  }
+}

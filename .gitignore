@@ -1,0 +1,24 @@
+# Local state, never publish
+.dsh/
+store.json
+*.log
+
+# Node
+node_modules/
+npm-debug.log*
+package-lock.json
+.npmrc
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Test scratch output that is regenerated on demand
+tests/out/
+tests/*.png.tmp
+
+# Render / build products (kept: docs/ screenshots checked on purpose)
+out/
+dist/
