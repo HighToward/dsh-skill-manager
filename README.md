@@ -1,6 +1,6 @@
 # dsh-skill-manager
 
-一个给 [DeepSeek Harness](https://github.com/deepseek-ai/DeepSeek-Harness) 用的技能管理面板，帮你把本机上装的所有技能看清楚、管好。
+一个面向 [DeepSeek Harness](https://github.com/deepseek-ai/DeepSeek-Harness) 的技能管理面板插件，用于统一浏览、分类与管理本机安装的全部技能。它扫描工作区与用户级技能目录，将技能按类型组织为卡片视图，支持自定义类型与技能归位；可调用指定模型为技能生成中文说明、为自定义类型生成图标；并提供技能关联分析与版本更新检查。
 
 版本 0.3.0，MIT 开源，作者 HighToward。
 
@@ -74,7 +74,7 @@ MIT。见 [LICENSE](LICENSE)。
 
 # English
 
-A skill manager panel for [DeepSeek Harness](https://github.com/deepseek-ai/DeepSeek-Harness). It scans every skill it can find on the machine, lays them out as a wall of type cards, lets you create your own types, move skills into them, have a model write a one-line Simplified Chinese description for each skill, draw an icon for each custom type, see how skills relate, and check whether any of them have a newer version.
+A skill management panel plugin for [DeepSeek Harness](https://github.com/deepseek-ai/DeepSeek-Harness), providing a single place to browse, classify and manage every skill installed on the machine. It scans workspace and user-level skill directories and presents skills as a wall of type cards, with support for custom types and reassigning skills between them. It can ask a chosen model to write a Simplified Chinese description for each skill and to draw an icon for each custom type, and it reports skill relations and available version updates.
 
 Version 0.3.0, MIT licensed, by HighToward.
 
