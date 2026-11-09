@@ -1,6 +1,6 @@
 {
   "name": "dsh-skill-manager",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "A DSH web panel that lists every skill on the machine, groups them by type, lets you make your own types, writes one-line Chinese descriptions with a model you pick, draws an icon for each custom type, shows how skills relate, and checks for updates.",
   "icon": "icon.svg",
@@ -51,6 +51,7 @@
     }
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "dsh": ">=0.2.2-rc.1"
   }
 }

@@ -1011,22 +1011,25 @@ window.__ModuleLoader__.load({
         return rows.filter((row) => row.skills.length > 0);
       }, [filters, data, locale]);
 
-      // The board is the front door: counts come from the full catalog, not
-      // from the filtered list, so the tiles do not move while the user types.
-      // A made-up shelf stays on the board while it is still empty, otherwise
-      // creating one would look like the button had done nothing.
+      // The board is the front door, but it still answers the filter chips:
+      // count each type from the filtered skills, so 已装载 / 未启用 / a source
+      // updates both the numbers and which tiles are worth showing. A made-up
+      // shelf stays on the board while it is still empty, otherwise creating
+      // one would look like the button had done nothing.
       const tiles = useMemo(() => {
         const declared = Array.isArray(data?.types) ? data.types : [];
+        const counts = new Map();
+        for (const skill of filters) counts.set(skill.type, (counts.get(skill.type) ?? 0) + 1);
         return declared
           .map((entry) => ({
             type: entry.type,
-            count: entry.names.length,
+            count: counts.get(entry.type) ?? 0,
             custom: entry.custom === true,
             label: typeof entry.label === 'string' ? entry.label : '',
             glyph: Array.isArray(entry.glyph) ? entry.glyph : [],
           }))
           .filter((entry) => entry.count > 0 || entry.custom === true);
-      }, [data]);
+      }, [data, filters]);
 
       /** The name shown for a shelf: the user's own words, or the built-in label. */
       const shelfLabel = (entry) => (entry.custom && entry.label !== '' ? entry.label : tr(`type.${entry.type}`));
@@ -1151,10 +1154,14 @@ window.__ModuleLoader__.load({
         glyph: entry.glyph,
       }));
 
-      // The board is the front door while no type is open and nothing is being
-      // searched; a search jumps straight to matching skills across all types,
-      // because making the user guess the type first would be slower.
-      const showBoard = typeFilter === 'all' && query.trim() === '';
+      // The board is the front door in card view: one tile per type. Switching
+      // to list view, opening a type, or searching all fall through to the
+      // shelves, which render the filtered skills as rows or cards. This is the
+      // fix for the 卡片/列表 toggle doing nothing on the first page.
+      const showBoard = typeFilter === 'all' && query.trim() === '' && view === 'cards';
+      // A breadcrumb belongs to a shelf the user opened or a search they ran,
+      // not to the plain list view of the whole catalog.
+      const showCrumb = typeFilter !== 'all' || query.trim() !== '';
 
       // The shelf currently open, when the user made it themselves. Only those
       // can be renamed or deleted; a built-in shelf is part of the classification.
@@ -1442,7 +1449,7 @@ window.__ModuleLoader__.load({
                 }, tr(`source.${key}`))),
               ),
             ),
-            showBoard
+            showCrumb === false
               ? null
               : h(
                 'div',

@@ -102,6 +102,65 @@ const findShapes = (tree) => {
   return found
 }
 
+// Collect the class names in a tree, invoking function components the same way
+// findShapes does. This lets a test tell a list row from a tile from a card,
+// which the plain text collector cannot do.
+const findClasses = (tree) => {
+  const found = []
+  const walk = (node) => {
+    if (node === null || node === undefined || node === false) return
+    if (typeof node === 'string' || typeof node === 'number') return
+    if (Array.isArray(node)) { node.forEach(walk); return }
+    if (typeof node !== 'object' || !node.props) return
+    if (typeof node.props.className === 'string') found.push(node.props.className)
+    if (typeof node.type === 'function') {
+      const saved = cells
+      cells = []
+      walk(node.type(node.props))
+      cells = saved
+      return
+    }
+    walk(node.props.children)
+  }
+  walk(tree)
+  return found
+}
+
+// Collect just the text inside .sc-tile-count spans. The generic text collector
+// cannot tell a tile count ("2 个") from the always-present summary line
+// "扫描了 2 个目录", which also contains "2 个". This reads the count spans only.
+const findTileCounts = (tree) => {
+  const found = []
+  const walk = (node) => {
+    if (node === null || node === undefined || node === false) return
+    if (typeof node === 'string' || typeof node === 'number') return
+    if (Array.isArray(node)) { node.forEach(walk); return }
+    if (typeof node !== 'object' || !node.props) return
+    if (node.props.className === 'sc-tile-count') {
+      const texts = []
+      const grab = (n) => {
+        if (n === null || n === undefined || n === false) return
+        if (typeof n === 'string' || typeof n === 'number') { texts.push(String(n)); return }
+        if (Array.isArray(n)) { n.forEach(grab); return }
+        if (typeof n === 'object' && n.props) grab(n.props.children)
+      }
+      grab(node.props.children)
+      found.push(texts.join(''))
+      return
+    }
+    if (typeof node.type === 'function') {
+      const saved = cells
+      cells = []
+      walk(node.type(node.props))
+      cells = saved
+      return
+    }
+    walk(node.props.children)
+  }
+  walk(tree)
+  return found
+}
+
 // Pass 1: the loading frame, so every useState slot is allocated in order.
 render()
 // Slot 2 data, 3 phase, 8 typeFilter, 13 model, 14 catalog.
@@ -137,6 +196,71 @@ const switched = collect(render())
 check('summary stays put after a model switch', switched, '说明由 qoder/dfmodel 生成')
 console.log(switched.join('|').includes('说明由 x/some-other-model 生成') ? 'MISS ' : 'ok   ', 'summary ignores the newly switched model: x/some-other-model')
 store[13] = 'workbuddy/deepseek-v4.1-flash'
+memo = {}
+
+// Pass 2b: the filter chips must reach the type board. A shelf holding one
+// loaded and one unloaded skill counts 2 with no filter, 1 with 已装载, and 1
+// with 未启用, while a shelf whose only skill is filtered out leaves the board
+// entirely. The old code took the counts straight from data.types, so none of
+// this moved when a chip was clicked.
+const filterPayload = {
+  ...payload,
+  skills: [
+    { ...skills[0], name: 'browser-a', type: 'browser', active: true, source: 'user-dsh' },
+    { ...skills[0], name: 'browser-b', type: 'browser', active: false, source: 'library' },
+    { ...skills[1], name: 'office-a', type: 'office', active: true, source: 'user-dsh' },
+  ],
+  types: [
+    { type: 'browser', names: ['browser-a', 'browser-b'] },
+    { type: 'office', names: ['office-a'] },
+  ],
+}
+store[5] = 'cards'   // view
+store[6] = ''        // query
+store[8] = 'all'     // typeFilter
+store[2] = filterPayload
+store[7] = 'all'     // source
+memo = {}
+const boardAllTree = render()
+const boardAll = collect(boardAllTree)
+const tileAll = findTileCounts(boardAllTree)
+console.log(tileAll.includes('2 个') ? 'ok   ' : 'MISS ', `board counts follow the catalog: tile counts = ${JSON.stringify(tileAll)}`)
+
+store[7] = 'active'
+memo = {}
+const boardActiveTree = render()
+const boardActive = collect(boardActiveTree)
+const tileActive = findTileCounts(boardActiveTree)
+console.log(tileActive.includes('1 个') && !tileActive.includes('2 个') ? 'ok   ' : 'MISS ', `已装载 drops the board count from 2 to 1: ${JSON.stringify(tileActive)}`)
+check('已装载 keeps the mixed shelf', boardActive, '浏览器与桌面')
+check('已装载 keeps the loaded shelf', boardActive, '文档与表格')
+
+store[7] = 'inactive'
+memo = {}
+const boardInactiveTree = render()
+const boardInactive = collect(boardInactiveTree)
+const tileInactive = findTileCounts(boardInactiveTree)
+console.log(tileInactive.includes('1 个') && !tileInactive.includes('2 个') ? 'ok   ' : 'MISS ', `未启用 drops the board count from 2 to 1: ${JSON.stringify(tileInactive)}`)
+console.log(boardInactive.join('|').includes('文档与表格') ? 'MISS ' : 'ok   ', '未启用 removes the empty shelf: 文档与表格')
+check('未启用 keeps the shelf that still has a skill', boardInactive, '浏览器与桌面')
+
+// Pass 2c: switching to list view on the first page must actually render skill
+// rows, not the type tiles. Slot 5 is the view toggle.
+store[7] = 'all'
+store[2] = payload
+store[5] = 'list'
+memo = {}
+const frontList = render()
+const frontListClasses = findClasses(frontList)
+console.log(frontListClasses.includes('sc-list') ? 'ok   ' : 'MISS ', 'front page list view renders sc-list')
+console.log(frontListClasses.includes('sc-row') ? 'ok   ' : 'MISS ', 'front page list view renders sc-row')
+console.log(frontListClasses.includes('sc-board') ? 'MISS ' : 'ok   ', 'front page list view hides the type board')
+console.log(frontListClasses.includes('sc-tile') ? 'MISS ' : 'ok   ', 'front page list view hides the tiles')
+const frontListTexts = collect(frontList)
+console.log(frontListTexts.join('|').includes('全部类型') ? 'MISS ' : 'ok   ', 'plain full list needs no breadcrumb')
+
+// Back to the defaults the later passes expect.
+store[5] = 'cards'
 memo = {}
 
 // Pass 3: drilled into one type. Slot 8 is the type filter.
